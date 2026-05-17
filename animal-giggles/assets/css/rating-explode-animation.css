@@ -1,0 +1,51 @@
+
+* {
+    box-sizing: border-box;
+}
+
+/*#explodeBtn {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#explodeBtn:hover {
+    transform: scale(1.06);
+    box-shadow: 0 16px 50px rgba(0,0,0,0.55), 0 0 30px rgba(139,92,246,0.55);
+}
+
+.particle {
+    position: fixed;
+    pointer-events: none;
+    will-change: transform, opacity;
+    transform-origin: center center;
+}*/
+
+
+.ag-rating-explosion-layer {
+	position: fixed;
+	inset: 0;
+	z-index: 999999;
+	pointer-events: none;
+	overflow: hidden;
+}
+
+.ag-rating-explosion-particle {
+	position: fixed;
+	width: 6px;
+	height: 6px;
+	border-radius: 2px;
+	background: gold;
+	pointer-events: none;
+	transform: translate(0, 0) scale(1);
+	opacity: 1;
+    animation: ag-rating-explode-particle 900ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes ag-rating-explode-particle {
+	to {
+		transform:
+			translate(var(--ag-explode-x), var(--ag-explode-y))
+			rotate(var(--ag-explode-rotate))
+			scale(0.2);
+		opacity: 0;
+	}
+}

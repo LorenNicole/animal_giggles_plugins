@@ -59,9 +59,32 @@ class Animal_Giggles {
 			AG_PLUGIN_VERSION
 		);
 
+		wp_register_style(
+			'ag-rating-explode-animation',
+			AG_PLUGIN_URL . 'assets/css/rating-explode-animation.css',
+			array( 'ag-frontend' ),
+			AG_PLUGIN_VERSION
+		);
+
 		wp_register_script(
 			'ag-frontend',
 			AG_PLUGIN_URL . 'assets/js/animal-giggles.js',
+			array(),
+			AG_PLUGIN_VERSION,
+			true
+		);
+
+		wp_register_script(
+			'ag-rating-animation-registry',
+			AG_PLUGIN_URL . 'assets/js/rating-animation-registry.js',
+			array(),
+			AG_PLUGIN_VERSION,
+			true
+		);
+
+		wp_register_script(
+			'ag-rating-explode-animation',
+			AG_PLUGIN_URL . 'assets/js/rating-explode-animation.js',
 			array(),
 			AG_PLUGIN_VERSION,
 			true
@@ -99,7 +122,10 @@ class Animal_Giggles {
 	public function enqueue_assets() {
 		wp_enqueue_style( 'ag-frontend' );
 		wp_enqueue_style( 'ag-giggle-this' );
+		wp_enqueue_style( 'ag-rating-explode-animation' );
 		wp_enqueue_script( 'ag-frontend' );
+		wp_enqueue_script( 'ag-rating-explode-animation' );
+		wp_enqueue_script( 'ag-rating-animation-registry' );
 	}
 
 	/**
@@ -337,7 +363,7 @@ class Animal_Giggles {
 							<span class="ag-rating-star-icon" aria-hidden="true">★</span>
 						</button>
 
-						<button type="button" class="ag-rating-star" data-rating-value="4" aria-label="<?php esc_attr_e( 'Rate 4 stars', 'animal-giggles' ); ?>">
+						<button type="button" id="explodeBtn" class="ag-rating-star" data-rating-value="4" aria-label="<?php esc_attr_e( 'Rate 4 stars', 'animal-giggles' ); ?>">
 							<span class="ag-rating-star-icon" aria-hidden="true">★</span>
 						</button>
 

@@ -850,7 +850,6 @@ function showRandomMatchingImage() {
 		});
 
 		clearHoveredRatingUI();
-		disableGiggleThis();
 	}
 
 	const CAPTION_MAX = 120;
@@ -1497,6 +1496,10 @@ ratingStars.forEach(function (star) {
 	});
 
 	star.addEventListener('click', async function () {
+		if (window.AnimalGigglesRatingAnimations) {
+			window.AnimalGigglesRatingAnimations.runRandom(star);
+		}
+		
 		if (!currentImageRow || !currentImageRow.imageId) {
 			setRatingStatus('No image is available to rate.');
 			return;
