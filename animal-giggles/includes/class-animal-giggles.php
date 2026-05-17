@@ -246,7 +246,7 @@ class Animal_Giggles {
 					id="random-giggle-btn"
 					class="ag-random-giggle-btn"
 				>
-					<?php esc_html_e( 'Select Random Giggle', 'animal-giggles' ); ?>
+					<?php esc_html_e( 'Surprise Giggle', 'animal-giggles' ); ?>
 				</button>	
 				<div class="ag-select-group">
 					<label for="animal-head" class="animal-part-label"><?php esc_html_e( 'Select a Head', 'animal-giggles' ); ?></label>
