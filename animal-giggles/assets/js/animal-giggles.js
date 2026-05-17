@@ -1420,14 +1420,18 @@ if (randomGiggleButton) {
 	randomGiggleButton.addEventListener('click', function () {
 		selectRandomAnimalCombination();
 
-		if (randomGiggleButton) {
-			randomGiggleButton.addEventListener('click', function () {
-				selectRandomAnimalCombination();
-
-				randomGigglePendingTracking = true;
-				randomGiggleSelectionKey = getCurrentSelectionKey();
-			});
+		if (!hasFullAnimalSelection()) {
+			return;
 		}
+
+		randomGigglePendingTracking = true;
+		randomGiggleSelectionKey = getCurrentSelectionKey();
+
+		hasExitedFullscreenMobile = false;
+		shouldOpenModal = true;
+
+		showImageFullscreenOnMobile();
+		showRandomMatchingImage();
 	});
 }
 
