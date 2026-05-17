@@ -66,6 +66,41 @@ class Animal_Giggles {
 			AG_PLUGIN_VERSION
 		);
 
+		wp_register_style(
+			'ag-rating-shock-wave-animation',
+			AG_PLUGIN_URL . 'assets/css/rating-shock-wave-animation.css',
+			array( 'ag-frontend' ),
+			AG_PLUGIN_VERSION
+		);
+
+		wp_register_style(
+			'ag-rating-grow-animation',
+			AG_PLUGIN_URL . 'assets/css/rating-grow-animation.css',
+			array( 'ag-frontend' ),
+			AG_PLUGIN_VERSION
+		);
+
+		wp_register_style(
+			'ag-rating-duplicate-animation',
+			AG_PLUGIN_URL . 'assets/css/rating-duplicate-animation.css',
+			array( 'ag-frontend' ),
+			AG_PLUGIN_VERSION
+		);
+
+		wp_register_style(
+			'ag-rating-animal-stampede-animation',
+			AG_PLUGIN_URL . 'assets/css/rating-animal-stampede-animation.css',
+			array( 'ag-frontend' ),
+			AG_PLUGIN_VERSION
+		);
+
+		wp_register_style(
+			'ag-rating-black-hole-animation',
+			AG_PLUGIN_URL . 'assets/css/rating-black-hole-animation.css',
+			array( 'ag-frontend' ),
+			AG_PLUGIN_VERSION
+		);
+
 		wp_register_script(
 			'ag-frontend',
 			AG_PLUGIN_URL . 'assets/js/animal-giggles.js',
@@ -85,6 +120,46 @@ class Animal_Giggles {
 		wp_register_script(
 			'ag-rating-explode-animation',
 			AG_PLUGIN_URL . 'assets/js/rating-explode-animation.js',
+			array(),
+			AG_PLUGIN_VERSION,
+			true
+		);
+
+		wp_register_script(
+			'ag-rating-shock-wave-animation',
+			AG_PLUGIN_URL . 'assets/js/rating-shock-wave-animation.js',
+			array(),
+			AG_PLUGIN_VERSION,
+			true
+		);
+
+		wp_register_script(
+			'ag-rating-grow-animation',
+			AG_PLUGIN_URL . 'assets/js/rating-grow-animation.js',
+			array(),
+			AG_PLUGIN_VERSION,
+			true
+		);
+
+		wp_register_script(
+			'ag-rating-duplicate-animation',
+			AG_PLUGIN_URL . 'assets/js/rating-duplicate-animation.js',
+			array(),
+			AG_PLUGIN_VERSION,
+			true
+		);
+
+		wp_register_script(
+			'ag-rating-animal-stampede-animation',
+			AG_PLUGIN_URL . 'assets/js/rating-animal-stampede-animation.js',
+			array(),
+			AG_PLUGIN_VERSION,
+			true
+		);
+
+		wp_register_script(
+			'ag-rating-black-hole-animation',
+			AG_PLUGIN_URL . 'assets/js/rating-black-hole-animation.js',
 			array(),
 			AG_PLUGIN_VERSION,
 			true
@@ -123,9 +198,20 @@ class Animal_Giggles {
 		wp_enqueue_style( 'ag-frontend' );
 		wp_enqueue_style( 'ag-giggle-this' );
 		wp_enqueue_style( 'ag-rating-explode-animation' );
+		wp_enqueue_style( 'ag-rating-shock-wave-animation' );
+		wp_enqueue_style( 'ag-rating-grow-animation' );
+		wp_enqueue_style( 'ag-rating-duplicate-animation' );
+		wp_enqueue_style( 'ag-rating-animal-stampede-animation' );
+		wp_enqueue_style( 'ag-rating-black-hole-animation' );
+
 		wp_enqueue_script( 'ag-frontend' );
 		wp_enqueue_script( 'ag-rating-explode-animation' );
+		wp_enqueue_script( 'ag-rating-shock-wave-animation' );
 		wp_enqueue_script( 'ag-rating-animation-registry' );
+		wp_enqueue_script( 'ag-rating-grow-animation' );
+		wp_enqueue_script( 'ag-rating-duplicate-animation' );
+		wp_enqueue_script( 'ag-rating-animal-stampede-animation' );
+		wp_enqueue_script( 'ag-rating-black-hole-animation' );
 	}
 
 	/**
