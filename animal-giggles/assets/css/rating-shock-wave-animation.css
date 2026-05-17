@@ -1,0 +1,44 @@
+.ag-shockwave-layer {
+	position: fixed;
+	inset: 0;
+	z-index: 999999;
+	pointer-events: none;
+	overflow: hidden;
+}
+
+.ag-shockwave-ring {
+	position: fixed;
+	border-radius: 50%;
+	border: 4px solid rgba(255,255,255,0.85);
+	transform: translate(-50%, -50%) scale(0);
+	opacity: 1;
+	will-change: transform, opacity;
+	animation: ag-shockwave-ring-expand var(--ag-ring-duration) cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes ag-shockwave-ring-expand {
+	to {
+		transform: translate(-50%, -50%) scale(1);
+		opacity: 0;
+	}
+}
+
+.ag-shockwave-particle {
+	position: fixed;
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	pointer-events: none;
+	opacity: 1;
+	will-change: transform, opacity;
+	animation: ag-shockwave-particle-move var(--ag-particle-duration) ease-out forwards;
+}
+
+@keyframes ag-shockwave-particle-move {
+	to {
+		transform:
+			translate(var(--ag-shockwave-x), var(--ag-shockwave-y))
+			scale(0.15);
+		opacity: 0;
+	}
+}

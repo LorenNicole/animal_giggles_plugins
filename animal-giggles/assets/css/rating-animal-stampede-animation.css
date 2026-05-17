@@ -1,0 +1,70 @@
+.ag-animal-stampede-layer {
+	position: fixed;
+	inset: 0;
+	z-index: 999999;
+	pointer-events: none;
+	overflow: hidden;
+}
+
+.ag-animal-stampede-animal {
+	position: fixed;
+	left: -120px;
+	top: 0;
+	line-height: 1;
+	opacity: 0;
+	will-change: transform, opacity;
+	animation: ag-animal-stampede-run linear forwards;
+}
+
+@keyframes ag-animal-stampede-run {
+	0% {
+		opacity: 0;
+		transform:
+			translateX(0)
+			translateY(0)
+			scaleX(var(--ag-direction))
+			scale(var(--ag-animal-scale))
+			rotate(0deg);
+	}
+
+	5% {
+		opacity: 1;
+	}
+
+	25% {
+		transform:
+			translateX(calc(var(--ag-run-distance) * 0.25))
+			translateY(calc(var(--ag-bounce-height) * -1))
+			scaleX(var(--ag-direction))
+			scale(var(--ag-animal-scale))
+			rotate(var(--ag-rotate-small));
+	}
+
+	50% {
+		transform:
+			translateX(calc(var(--ag-run-distance) * 0.5))
+			translateY(0)
+			scaleX(var(--ag-direction))
+			scale(var(--ag-animal-scale))
+			rotate(0deg);
+	}
+
+	75% {
+		transform:
+			translateX(calc(var(--ag-run-distance) * 0.75))
+			translateY(calc(var(--ag-bounce-height) * -1))
+			scaleX(var(--ag-direction))
+			scale(var(--ag-animal-scale))
+			rotate(calc(var(--ag-rotate-small) * -1));
+	}
+
+	100% {
+		opacity: 0;
+		transform:
+			translateX(var(--ag-run-distance))
+			translateY(0)
+			scaleX(var(--ag-direction))
+			scale(var(--ag-animal-scale))
+			rotate(0deg);
+	}
+}
