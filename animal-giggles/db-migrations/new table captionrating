@@ -1,0 +1,22 @@
+CREATE TABLE IF NOT EXISTS `ag_caption_rating` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `caption_id` BIGINT UNSIGNED NOT NULL,
+  `rating` TINYINT UNSIGNED NOT NULL,
+  `dataAdded` DATETIME NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_captionrating_caption_id` (`caption_id`),
+  KEY `idx_captionrating_rating` (`rating`),
+  CONSTRAINT `fk_captionrating_caption_id`
+    FOREIGN KEY (`caption_id`)
+    REFERENCES `captions` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `chk_captionrating_rating`
+    CHECK (`rating` IN (1, 2, 3))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+ALTER TABLE `ag_caption_rating`
+  DROP INDEX `idx_captionrating_rating`,
+  DROP CHECK `chk_captionrating_rating`,
+  DROP COLUMN `rating`,
+  ADD COLUMN `liked` TINYINT(1) NOT NULL DEFAULT 0 AFTER `caption_id`;

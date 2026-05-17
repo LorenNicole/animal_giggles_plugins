@@ -22,6 +22,12 @@ class Animal_Giggles_Data_Service {
 
 		add_action( 'wp_ajax_ag_submit_animal_request', array( $this, 'ajax_submit_animal_request' ) );
 		add_action( 'wp_ajax_nopriv_ag_submit_animal_request', array( $this, 'ajax_submit_animal_request' ) );
+
+		add_action( 'wp_ajax_ag_get_captions', array( $this, 'ajax_get_captions' ) );
+		add_action( 'wp_ajax_nopriv_ag_get_captions', array( $this, 'ajax_get_captions' ) );
+
+		add_action( 'wp_ajax_ag_submit_caption', array( $this, 'ajax_submit_caption' ) );
+		add_action( 'wp_ajax_nopriv_ag_submit_caption', array( $this, 'ajax_submit_caption' ) );
 	}
 
 	public function get_animal_config() {
@@ -486,6 +492,131 @@ class Animal_Giggles_Data_Service {
 
 		wp_send_json_success(
 			array( 'message' => __( 'Request submitted. Thank you!', 'animal-giggles' ) )
+		);
+	}
+
+	/**
+	 * Fetch approved captions for an image.
+	 *
+	 * @return void
+	 */
+	public function ajax_get_captions() {
+		check_ajax_referer( 'ag_nonce', 'nonce' );
+
+		$image_id = isset( $_POST['image_id'] ) ? (int) $_POST['image_id'] : 0;
+
+		if ( $image_id < 1 ) {
+			wp_send_json_error(
+				array( 'message' => __( 'Invalid image.', 'animal-giggles' ) ),
+				400
+			);
+		}
+
+		global $wpdb;
+
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"
+				SELECT id, caption
+				FROM captions
+				WHERE image_id = %d
+					AND status = 'approved'
+				ORDER BY dateadded DESC, id DESC
+				",
+				$image_id
+			),
+			ARRAY_A
+		);
+
+		$captions = array();
+
+		if ( ! empty( $rows ) ) {
+			foreach ( $rows as $row ) {
+				$captions[] = array(
+					'id'      => isset( $row['id'] ) ? (int) $row['id'] : 0,
+					'caption' => isset( $row['caption'] ) ? (string) $row['caption'] : '',
+				);
+			}
+		}
+
+		wp_send_json_success(
+			array(
+				'captions' => $captions,
+			)
+		);
+	}
+
+	/**
+	 * Submit a caption for moderation (pending).
+	 *
+	 * @return void
+	 */
+	public function ajax_submit_caption() {
+		check_ajax_referer( 'ag_nonce', 'nonce' );
+
+		$image_id = isset( $_POST['image_id'] ) ? (int) $_POST['image_id'] : 0;
+		$caption  = isset( $_POST['caption'] ) ? sanitize_text_field( wp_unslash( $_POST['caption'] ) ) : '';
+		$caption  = trim( $caption );
+
+		if ( $image_id < 1 ) {
+			wp_send_json_error(
+				array( 'message' => __( 'Invalid image.', 'animal-giggles' ) ),
+				400
+			);
+		}
+
+		if ( '' === $caption ) {
+			wp_send_json_error(
+				array( 'message' => __( 'Please enter a caption.', 'animal-giggles' ) ),
+				400
+			);
+		}
+
+		if ( mb_strlen( $caption ) > 120 ) {
+			wp_send_json_error(
+				array( 'message' => __( 'Caption must be 120 characters or fewer.', 'animal-giggles' ) ),
+				400
+			);
+		}
+
+		global $wpdb;
+
+		$image_exists = $wpdb->get_var(
+			$wpdb->prepare(
+				'SELECT ImageId FROM images WHERE ImageId = %d LIMIT 1',
+				$image_id
+			)
+		);
+
+		if ( ! $image_exists ) {
+			wp_send_json_error(
+				array( 'message' => __( 'Image not found.', 'animal-giggles' ) ),
+				404
+			);
+		}
+
+		$result = $wpdb->insert(
+			'captions',
+			array(
+				'image_id'  => $image_id,
+				'caption'   => $caption,
+				'status'    => 'pending',
+				'dateadded' => current_time( 'mysql' ),
+			),
+			array( '%d', '%s', '%s', '%s' )
+		);
+
+		if ( false === $result ) {
+			wp_send_json_error(
+				array( 'message' => __( 'Unable to submit caption right now.', 'animal-giggles' ) ),
+				500
+			);
+		}
+
+		wp_send_json_success(
+			array(
+				'message' => __( 'Thanks! Your caption is pending approval (1–3 days).', 'animal-giggles' ),
+			)
 		);
 	}
 }

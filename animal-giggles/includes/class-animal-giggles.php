@@ -52,6 +52,13 @@ class Animal_Giggles {
 			AG_PLUGIN_VERSION
 		);
 
+		wp_register_style(
+			'ag-giggle-this',
+			AG_PLUGIN_URL . 'assets/css/giggle-this.css',
+			array( 'ag-frontend' ),
+			AG_PLUGIN_VERSION
+		);
+
 		wp_register_script(
 			'ag-frontend',
 			AG_PLUGIN_URL . 'assets/js/animal-giggles.js',
@@ -91,6 +98,7 @@ class Animal_Giggles {
 	 */
 	public function enqueue_assets() {
 		wp_enqueue_style( 'ag-frontend' );
+		wp_enqueue_style( 'ag-giggle-this' );
 		wp_enqueue_script( 'ag-frontend' );
 	}
 
@@ -340,6 +348,39 @@ class Animal_Giggles {
 
 					<div id="ag-rating-status" class="ag-rating-status" aria-live="polite"></div>
 				</div>
+
+					<section id="ag-giggle-this" class="ag-giggle-this is-disabled" aria-labelledby="ag-giggle-this-heading">
+						<h4 id="ag-giggle-this-heading" class="ag-giggle-this__heading">
+							<?php esc_html_e( 'Giggle This', 'animal-giggles' ); ?>
+							<span
+								class="ag-giggle-this__info"
+								tabindex="0"
+								role="button"
+								aria-label="<?php esc_attr_e( "All 'Giggle This' submissions take 1-3 days to be approved, or declined (if inappropriate).", 'animal-giggles' ); ?>"
+							></span>
+						</h4>
+
+						<div id="ag-giggle-this-list" class="ag-giggle-this__list" role="region" aria-label="<?php esc_attr_e( 'Approved captions', 'animal-giggles' ); ?>"></div>
+
+						<form id="ag-giggle-this-form" class="ag-giggle-this__form">
+							<div class="label-with-count">
+								<label for="ag-giggle-this-input"><?php esc_html_e( 'Your caption', 'animal-giggles' ); ?></label>
+								<div class="char-count" data-for="ag-giggle-this-input"></div>
+							</div>
+							<textarea
+								id="ag-giggle-this-input"
+								name="caption"
+								maxlength="120"
+								rows="2"
+								placeholder="<?php esc_attr_e( 'Write a funny caption…', 'animal-giggles' ); ?>"
+								required
+							></textarea>
+							<button type="submit" id="ag-giggle-this-submit" class="ag-giggle-this__submit">
+								<?php esc_html_e( 'Submit', 'animal-giggles' ); ?>
+							</button>
+							<div id="ag-giggle-this-status" class="ag-giggle-this__status" aria-live="polite"></div>
+						</form>
+					</section>
 
 					<div class="ag-action-buttons">
 						<!-- <button

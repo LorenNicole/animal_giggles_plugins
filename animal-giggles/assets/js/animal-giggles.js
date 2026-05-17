@@ -39,7 +39,15 @@ document.addEventListener('DOMContentLoaded', function () {
 	const ratingMeters = [ratingMeterDesktop, ratingMeterModal].filter(Boolean);
 	const ratingStatus = document.getElementById('ag-rating-status');
 	const ratingStars = Array.from(document.querySelectorAll('.ag-rating-star'));
-	const ratingStarsWraps = Array.from(document.querySelectorAll('.ag-rating-stars'));	let currentImageRow = null;
+	const ratingStarsWraps = Array.from(document.querySelectorAll('.ag-rating-stars'));
+	const giggleThisSection = document.getElementById('ag-giggle-this');
+	const giggleThisList = document.getElementById('ag-giggle-this-list');
+	const giggleThisForm = document.getElementById('ag-giggle-this-form');
+	const giggleThisInput = document.getElementById('ag-giggle-this-input');
+	const giggleThisSubmit = document.getElementById('ag-giggle-this-submit');
+	const giggleThisStatus = document.getElementById('ag-giggle-this-status');
+
+	let currentImageRow = null;
 
 	let currentSelectedRating = null;
 	let hasExitedFullscreenMobile = false;
@@ -187,6 +195,7 @@ function hideCurrentImageKeepFrame() {
 	currentImageRow = null;
 	updateRequestorInfo(null);
 	disableRatingMeter();
+	disableGiggleThis();
 	clearSelectedRatingUI();
 	updateDownloadAndShareButtonStates();
 }
@@ -613,6 +622,8 @@ function loadImageSource(imageUrl, imageAlt, onFailure) {
 			openImageModal();
 			shouldOpenModal = false;
 		}
+
+		refreshGiggleThisForCurrentImage();
 	};
 
 	giggleImage.onerror = function () {
@@ -648,6 +659,7 @@ function handleNoImageFound() {
 
 	updateShareUrlForSelection(selectedHead, selectedBody, selectedButt, fallbackProductId);
 	disableRatingMeter();
+	disableGiggleThis();
 	updateRequestorInfo(null);
 
 	if (!fallbackImage) {
@@ -821,6 +833,11 @@ function showRandomMatchingImage() {
 		ratingStars.forEach(function (star) {
 			star.disabled = false;
 		});
+
+		if (currentImageRow && currentImageRow.imageId) {
+			enableGiggleThis();
+			updateCaptionLimitUI(currentImageRow.imageId);
+		}
 	}
 
 	function disableRatingMeter() {
@@ -833,6 +850,256 @@ function showRandomMatchingImage() {
 		});
 
 		clearHoveredRatingUI();
+		disableGiggleThis();
+	}
+
+	const CAPTION_MAX = 120;
+	const CAPTION_LIMIT = 3;
+	const CAPTION_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
+	const CAPTION_LS_KEY = 'ag_giggle_this_submissions';
+
+	function readCaptionStorage() {
+		try {
+			const raw = localStorage.getItem(CAPTION_LS_KEY);
+
+			if (!raw) {
+				return { byImage: {} };
+			}
+
+			const parsed = JSON.parse(raw);
+
+			if (parsed && typeof parsed === 'object' && parsed.byImage) {
+				return parsed;
+			}
+
+			return { byImage: {} };
+		} catch (error) {
+			return { byImage: {} };
+		}
+	}
+
+	function writeCaptionStorage(data) {
+		try {
+			localStorage.setItem(CAPTION_LS_KEY, JSON.stringify(data));
+		} catch (error) {
+			console.warn('Could not save caption submissions to localStorage.', error);
+		}
+	}
+
+	function getCaptionSubmissions(imageId) {
+		const key = String(imageId);
+		const storage = readCaptionStorage();
+		const now = Date.now();
+		const entries = Array.isArray(storage.byImage[key]) ? storage.byImage[key] : [];
+		const fresh = entries.filter(function (entry) {
+			return (
+				entry &&
+				typeof entry.submittedAt === 'number' &&
+				now - entry.submittedAt < CAPTION_WINDOW_MS
+			);
+		});
+
+		storage.byImage[key] = fresh;
+		writeCaptionStorage(storage);
+
+		return fresh;
+	}
+
+	function canSubmitCaption(imageId) {
+		if (!imageId) {
+			return false;
+		}
+
+		return getCaptionSubmissions(imageId).length < CAPTION_LIMIT;
+	}
+
+	function recordCaptionSubmission(imageId) {
+		const key = String(imageId);
+		const storage = readCaptionStorage();
+
+		if (!Array.isArray(storage.byImage[key])) {
+			storage.byImage[key] = [];
+		}
+
+		storage.byImage[key].push({ submittedAt: Date.now() });
+		writeCaptionStorage(storage);
+	}
+
+	function setGiggleThisStatus(message, type) {
+		if (!giggleThisStatus) {
+			return;
+		}
+
+		giggleThisStatus.textContent = message || '';
+		giggleThisStatus.classList.remove('is-error', 'is-success');
+
+		if (type === 'error') {
+			giggleThisStatus.classList.add('is-error');
+		}
+
+		if (type === 'success') {
+			giggleThisStatus.classList.add('is-success');
+		}
+	}
+
+	function renderCaptionsList(captions) {
+		if (!giggleThisList) {
+			return;
+		}
+
+		giggleThisList.innerHTML = '';
+
+		if (!captions || !captions.length) {
+			const empty = document.createElement('p');
+			empty.className = 'ag-giggle-this__empty';
+			empty.textContent = 'No giggles yet — be the first!';
+			giggleThisList.appendChild(empty);
+			return;
+		}
+
+		captions.forEach(function (item) {
+			const captionEl = document.createElement('p');
+			captionEl.className = 'ag-giggle-this__caption';
+			captionEl.textContent = item.caption || '';
+			giggleThisList.appendChild(captionEl);
+		});
+	}
+
+	async function loadCaptionsForImage(imageId) {
+		if (!giggleThisList || !imageId) {
+			if (giggleThisList) {
+				giggleThisList.innerHTML = '';
+			}
+			return;
+		}
+
+		const ajaxUrl = localizedData.ajaxUrl || '';
+		const nonce = localizedData.nonce || '';
+
+		if (!ajaxUrl || !nonce) {
+			return;
+		}
+
+		try {
+			const response = await fetch(ajaxUrl, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+				},
+				body: new URLSearchParams({
+					action: 'ag_get_captions',
+					nonce: nonce,
+					image_id: imageId
+				})
+			});
+
+			const result = await response.json();
+
+			if (!result || !result.success) {
+				renderCaptionsList([]);
+				return;
+			}
+
+			const captions = result.data && result.data.captions ? result.data.captions : [];
+			renderCaptionsList(captions);
+		} catch (error) {
+			console.error('Failed to load captions:', error);
+			renderCaptionsList([]);
+		}
+	}
+
+	function updateCaptionLimitUI(imageId) {
+		if (!giggleThisSubmit) {
+			return;
+		}
+
+		const allowed = canSubmitCaption(imageId);
+		giggleThisSubmit.disabled = !allowed;
+
+		if (!allowed) {
+			setGiggleThisStatus(
+				'You can submit up to 3 captions for this image every 7 days.',
+				'error'
+			);
+		} else if (giggleThisStatus && giggleThisStatus.classList.contains('is-error')) {
+			setGiggleThisStatus('');
+		}
+	}
+
+	function enableGiggleThis() {
+		if (giggleThisSection) {
+			giggleThisSection.classList.remove('is-disabled');
+		}
+	}
+
+	function disableGiggleThis() {
+		if (giggleThisSection) {
+			giggleThisSection.classList.add('is-disabled');
+		}
+
+		if (giggleThisList) {
+			giggleThisList.innerHTML = '';
+		}
+
+		if (giggleThisForm) {
+			giggleThisForm.reset();
+		}
+
+		if (giggleThisSubmit) {
+			giggleThisSubmit.disabled = true;
+		}
+
+		setGiggleThisStatus('');
+	}
+
+	function refreshGiggleThisForCurrentImage() {
+		if (!currentImageRow || !currentImageRow.imageId) {
+			disableGiggleThis();
+			return;
+		}
+
+		enableGiggleThis();
+		updateCaptionLimitUI(currentImageRow.imageId);
+		loadCaptionsForImage(currentImageRow.imageId);
+	}
+
+	async function submitCaptionToServer(imageId, captionText) {
+		const ajaxUrl = localizedData.ajaxUrl || '';
+		const nonce = localizedData.nonce || '';
+
+		if (!ajaxUrl || !nonce) {
+			return null;
+		}
+
+		try {
+			const response = await fetch(ajaxUrl, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+				},
+				body: new URLSearchParams({
+					action: 'ag_submit_caption',
+					nonce: nonce,
+					image_id: imageId,
+					caption: captionText
+				})
+			});
+
+			const result = await response.json();
+
+			if (!result || !result.success) {
+				throw new Error(
+					result && result.data && result.data.message
+						? result.data.message
+						: 'Caption submission failed.'
+				);
+			}
+
+			return result.data;
+		} catch (error) {
+			console.error('Caption submission failed:', error);
+			return { error: error.message || 'Caption submission failed.' };
+		}
 	}
 
 function clearSelectedRatingUI() {
@@ -1531,6 +1798,83 @@ if (giggleImageWrap) {
 			closeImageModal();
 		}
 	});
+
+	if (giggleThisForm) {
+		giggleThisForm.addEventListener('submit', async function (event) {
+			event.preventDefault();
+
+			if (!currentImageRow || !currentImageRow.imageId) {
+				setGiggleThisStatus('Generate an animal image before submitting a caption.', 'error');
+				return;
+			}
+
+			const imageId = currentImageRow.imageId;
+			const captionText = giggleThisInput ? giggleThisInput.value.trim() : '';
+
+			if (!captionText) {
+				setGiggleThisStatus('Please enter a caption.', 'error');
+				return;
+			}
+
+			if (captionText.length > CAPTION_MAX) {
+				setGiggleThisStatus('Caption must be 120 characters or fewer.', 'error');
+				return;
+			}
+
+			if (!canSubmitCaption(imageId)) {
+				setGiggleThisStatus(
+					'You can submit up to 3 captions for this image every 7 days.',
+					'error'
+				);
+				updateCaptionLimitUI(imageId);
+				return;
+			}
+
+			if (giggleThisSubmit) {
+				giggleThisSubmit.disabled = true;
+			}
+
+			setGiggleThisStatus('Submitting…', '');
+
+			const result = await submitCaptionToServer(imageId, captionText);
+
+			if (!result || result.error) {
+				setGiggleThisStatus(
+					result && result.error ? result.error : 'Unable to submit caption right now.',
+					'error'
+				);
+				updateCaptionLimitUI(imageId);
+				return;
+			}
+
+			recordCaptionSubmission(imageId);
+
+			if (giggleThisForm) {
+				giggleThisForm.reset();
+			}
+
+			if (giggleThisInput) {
+				const counter = document.querySelector('[data-for="ag-giggle-this-input"]');
+				if (counter) {
+					counter.textContent = '0/' + CAPTION_MAX;
+				}
+			}
+
+			setGiggleThisStatus(
+				result.message || 'Thanks! Your caption is pending approval (1–3 days).',
+				'success'
+			);
+			updateCaptionLimitUI(imageId);
+		});
+
+		if (giggleThisInput) {
+			giggleThisInput.addEventListener('input', function () {
+				if (giggleThisStatus && giggleThisStatus.classList.contains('is-error')) {
+					setGiggleThisStatus('');
+				}
+			});
+		}
+	}
 
 	resetSelect(bodySelect, placeholderText);
 	resetSelect(buttSelect, placeholderText);
