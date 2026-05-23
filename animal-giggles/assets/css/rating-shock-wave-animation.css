@@ -8,37 +8,52 @@
 
 .ag-shockwave-ring {
 	position: fixed;
+	left: var(--ag-ring-left);
+	top: var(--ag-ring-top);
+	width: var(--ag-ring-size);
+	height: var(--ag-ring-size);
 	border-radius: 50%;
-	border: 4px solid rgba(255,255,255,0.85);
-	transform: translate(-50%, -50%) scale(0);
-	opacity: 1;
+	border-style: solid;
+	border-width: var(--ag-ring-thickness);
+	border-color: var(--ag-ring-color);
+	box-shadow:
+		0 0 var(--ag-ring-glow-size) var(--ag-ring-color),
+		inset 0 0 calc(var(--ag-ring-glow-size) * 0.55) var(--ag-ring-color);
+	opacity: 0;
+	transform: translate(-50%, -50%) scale(0.02);
 	will-change: transform, opacity;
-	animation: ag-shockwave-ring-expand var(--ag-ring-duration) cubic-bezier(0.16, 1, 0.3, 1) forwards;
+	animation:
+		ag-shockwave-ring-expand var(--ag-ring-duration) cubic-bezier(0.16, 1, 0.3, 1) forwards,
+		ag-shockwave-ring-pulse 420ms ease-in-out infinite alternate;
+	animation-delay: var(--ag-ring-delay), var(--ag-ring-delay);
 }
 
 @keyframes ag-shockwave-ring-expand {
-	to {
-		transform: translate(-50%, -50%) scale(1);
+	0% {
 		opacity: 0;
+		transform: translate(-50%, -50%) scale(0.02);
+	}
+
+	10% {
+		opacity: 1;
+	}
+
+	65% {
+		opacity: 0.9;
+	}
+
+	100% {
+		opacity: 0;
+		transform: translate(-50%, -50%) scale(var(--ag-ring-end-scale));
 	}
 }
 
-.ag-shockwave-particle {
-	position: fixed;
-	width: 8px;
-	height: 8px;
-	border-radius: 50%;
-	pointer-events: none;
-	opacity: 1;
-	will-change: transform, opacity;
-	animation: ag-shockwave-particle-move var(--ag-particle-duration) ease-out forwards;
-}
+@keyframes ag-shockwave-ring-pulse {
+	from {
+		filter: brightness(0.85);
+	}
 
-@keyframes ag-shockwave-particle-move {
 	to {
-		transform:
-			translate(var(--ag-shockwave-x), var(--ag-shockwave-y))
-			scale(0.15);
-		opacity: 0;
+		filter: brightness(1.45);
 	}
 }
