@@ -419,7 +419,7 @@ main {
 	margin-top: 1rem;
 }
 
-..ag-giggle-meter.is-disabled .ag-rating-stars  {
+.ag-giggle-meter.is-disabled .ag-rating-stars  {
 	/*opacity: 0.5;*/
 	pointer-events: none;
 }
@@ -430,11 +430,16 @@ main {
 
 .ag-giggle-meter.is-disabled .ag-rating-star.is-selected .ag-rating-star-icon {
 	color: #fbbf24;
+	opacity: 1;
 	text-shadow: 0 0 12px rgba(251, 191, 36, 0.35);
 }
 
 .ag-giggle-meter.is-disabled .ag-rating-star:not(.is-selected) .ag-rating-star-icon {
 	color: #e5e7eb;
+}
+
+.ag-giggle-meter.is-disabled .ag-rating-star.is-selected {
+	opacity: 1;
 }
 
 .ag-giggle-meter-header {

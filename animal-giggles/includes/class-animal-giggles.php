@@ -479,8 +479,6 @@ class Animal_Giggles {
 							<span class="ag-rating-star-icon" aria-hidden="true">★</span>
 						</button>
 					</div>
-
-					<div id="ag-rating-status" class="ag-rating-status" aria-live="polite"></div>
 				</div>
 
 					<section id="ag-giggle-this" class="ag-giggle-this is-disabled" aria-labelledby="ag-giggle-this-heading">

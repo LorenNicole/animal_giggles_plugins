@@ -37,7 +37,6 @@ document.addEventListener('DOMContentLoaded', function () {
 	const ratingMeterDesktop = document.getElementById('ag-giggle-meter');
 	const ratingMeterModal = document.getElementById('ag-giggle-meter-modal');
 	const ratingMeters = [ratingMeterDesktop, ratingMeterModal].filter(Boolean);
-	const ratingStatus = document.getElementById('ag-rating-status');
 	const ratingStars = Array.from(document.querySelectorAll('.ag-rating-star'));
 	const ratingStarsWraps = Array.from(document.querySelectorAll('.ag-rating-stars'));
 	const giggleThisSection = document.getElementById('ag-giggle-this');
@@ -765,10 +764,10 @@ function loadImageFromRow(row, triedRowNumbers = []) {
 	updateRequestorInfo(row);
 	updateShareUrlForRow(row, 'replace');
 	applyRowToSelectors(row);
+	clearSelectedRatingUI();
+
 	enableRatingMeter();
 	refreshGiggleThisForCurrentImage();
-	clearSelectedRatingUI();
-	setRatingStatus('');
 
 	const rowNumber = Number(row.rowNumber);
 
@@ -776,8 +775,6 @@ function loadImageFromRow(row, triedRowNumbers = []) {
 		handleNoImageFound();
 		return;
 	}
-
-	//const nextTriedRowNumbers = [...triedRowNumbers, rowNumber];
 
 	const imageUrl = getImageUrlFromRow(row);
 
@@ -830,9 +827,9 @@ function showRandomMatchingImage() {
 	currentImageRow = chosenRow;
 	updateRequestorInfo(chosenRow);
 	updateShareUrlForRow(chosenRow, 'push');
-	enableRatingMeter();
 	clearSelectedRatingUI();
-	setRatingStatus('');
+	
+	enableRatingMeter();
 	refreshGiggleThisForCurrentImage();
 
 	const isRandomGeneration =
@@ -859,20 +856,29 @@ function showRandomMatchingImage() {
 
 }
 
-	function enableRatingMeter() {
-		ratingMeters.forEach(function (meter) {
-			meter.classList.remove('is-disabled');
-		});
+function enableRatingMeter() {
+	ratingMeters.forEach(function (meter) {
+		meter.classList.remove('is-disabled');
+	});
 
-		ratingStars.forEach(function (star) {
-			star.disabled = false;
-		});
+	ratingStars.forEach(function (star) {
+		star.disabled = false;
+	});
 
-		if (currentImageRow && currentImageRow.imageId) {
-			enableGiggleThis();
-			updateCaptionLimitUI(currentImageRow.imageId);
-		}
+	if (currentImageRow && currentImageRow.imageId) {
+		enableGiggleThis();
+		updateCaptionLimitUI(currentImageRow.imageId);
 	}
+
+	const storedRating =
+		currentImageRow && currentImageRow.imageId
+			? getStoredRating(currentImageRow.imageId)
+			: null;
+
+	if (storedRating) {
+		lockRatingMeterWithRating(storedRating);
+	}
+}
 
 	function disableRatingMeter() {
 		ratingMeters.forEach(function (meter) {
@@ -1110,15 +1116,63 @@ function setHoveredRatingUI(ratingValue) {
 	});
 }
 
-function setRatingStatus(message) {
-	if (ratingStatus) {
-		ratingStatus.textContent = message || '';
+function getStoredImageRatings() {
+
+	try {
+
+		return JSON.parse(
+			localStorage.getItem('ag_image_ratings') || '{}'
+		);
+
+	} catch (error) {
+
+		return {};
 	}
+}
+
+function getStoredRating(imageId) {
+
+	if (!imageId) {
+		return null;
+	}
+
+	const ratings = getStoredImageRatings();
+
+	return ratings[String(imageId)] || null;
+}
+
+function storeImageRating(imageId, ratingValue) {
+
+	if (!imageId || !ratingValue) {
+		return;
+	}
+
+	const ratings = getStoredImageRatings();
+
+	ratings[String(imageId)] = Number(ratingValue);
+
+	localStorage.setItem(
+		'ag_image_ratings',
+		JSON.stringify(ratings)
+	);
 }
 
 function clearHoveredRatingUI() {
 	ratingStars.forEach(function (star) {
 		star.classList.remove('is-hovered');
+	});
+}
+
+function lockRatingMeterWithRating(ratingValue) {
+	setSelectedRatingUI(ratingValue);
+	clearHoveredRatingUI();
+
+	ratingStars.forEach(function (star) {
+		star.disabled = true;
+	});
+
+	ratingMeters.forEach(function (meter) {
+		meter.classList.add('is-disabled');
 	});
 }
 
@@ -1293,37 +1347,6 @@ function updateDownloadAndShareButtonStates() {
         observer.observe(giggleImageWrap, { attributes: true, attributeFilter: ['hidden', 'style'] });
     }
 
-    // Click handler: prefer canvas data if drawn, otherwise use image src
-	// if (downloadBtn) {
-	// 	downloadBtn.addEventListener('click', function () {
-	// 		var href = '';
-	// 		try {
-	// 			if (giggleCanvas && !giggleCanvas.hidden) {
-	// 				href = giggleCanvas.toDataURL('image/jpg');
-	// 			}
-	// 		} catch (e) {
-	// 			href = '';
-	// 		}
-
-	// 		if (!href) {
-	// 			href = giggleImage.src;
-	// 		}
-
-	// 		if (!href) {
-	// 			return;
-	// 		}
-
-	// 		var filename = 'animal-giggle.jpg';
-	// 		var a = document.createElement('a');
-	// 		a.href = href;
-	// 		a.download = filename;
-	// 		// For data URLs this works; for same-origin image URLs it will download the file directly.
-	// 		document.body.appendChild(a);
-	// 		a.click();
-	// 		document.body.removeChild(a);
-	// 	});
-	// }
-
 	if (shareBtn) {
 		shareBtn.addEventListener('click', async function () {
 			const shareUrl = window.location.href;
@@ -1437,7 +1460,6 @@ function updateDownloadAndShareButtonStates() {
 			applyRowToSelectors(row);
 			enableRatingMeter();
 			clearSelectedRatingUI();
-			setRatingStatus('');
 
 			const imageUrl = getImageUrlFromRow(row);
 
@@ -1487,9 +1509,18 @@ ratingStars.forEach(function (star) {
 				window.AnimalGigglesRatingAnimations.runRandom(star);
 			}
 		}
+
+		const existingRating =
+			currentImageRow &&
+			currentImageRow.imageId
+				? getStoredRating(currentImageRow.imageId)
+				: null;
+
+		if (existingRating) {
+			return;
+		}
 		
 		if (!currentImageRow || !currentImageRow.imageId) {
-			setRatingStatus('No image is available to rate.');
 			return;
 		}
 
@@ -1504,7 +1535,6 @@ ratingStars.forEach(function (star) {
 		});
 
 		setSelectedRatingUI(ratingValue);
-		setRatingStatus('Saving your rating...');
 
 		const result = await submitImageRating(currentImageRow.imageId, ratingValue);
 
@@ -1513,13 +1543,15 @@ ratingStars.forEach(function (star) {
 				item.disabled = false;
 			});
 
-			setRatingStatus('Unable to save rating right now.');
 			return;
 		}
 
-		clearHoveredRatingUI();
-		setSelectedRatingUI(ratingValue);
-		disableRatingMeter();
+		storeImageRating(
+			currentImageRow.imageId,
+			ratingValue
+		);
+		
+		lockRatingMeterWithRating(ratingValue);
 
 		const average = result.ratings && result.ratings.average_rating
 			? Number(result.ratings.average_rating).toFixed(2)
@@ -1529,7 +1561,6 @@ ratingStars.forEach(function (star) {
 			? result.ratings.total_ratings
 			: 0;
 
-		setRatingStatus('Thanks! Average rating: ' + average + ' (' + totalRatings + ' ratings)');
 	});
 });
 
@@ -1589,13 +1620,8 @@ function openImageModal() {
 	imageModal.hidden = false;
 	document.body.classList.add('ag-modal-open');
 
-	if (currentSelectedRating) {
-		setSelectedRatingUI(currentSelectedRating);
-		disableRatingMeter();
-	} else {
-		clearSelectedRatingUI();
-		enableRatingMeter();
-	}
+	clearSelectedRatingUI();
+	enableRatingMeter();
 
 	imageModalImg.alt = giggleImage.alt || 'Generated animal image';
 
