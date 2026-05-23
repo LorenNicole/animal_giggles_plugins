@@ -766,6 +766,7 @@ function loadImageFromRow(row, triedRowNumbers = []) {
 	updateShareUrlForRow(row, 'replace');
 	applyRowToSelectors(row);
 	enableRatingMeter();
+	refreshGiggleThisForCurrentImage();
 	clearSelectedRatingUI();
 	setRatingStatus('');
 
@@ -806,6 +807,7 @@ function showRandomMatchingImage() {
 
 	if (isSameAnimalRequested && deviceIsDesktop) {
 		openImageModal(); // uses existing src
+		refreshGiggleThisForCurrentImage();
 		return;
 	}
 
@@ -823,13 +825,15 @@ function showRandomMatchingImage() {
 		return;
 	}
 
+	applyRowToSelectors(chosenRow);
+
 	currentImageRow = chosenRow;
 	updateRequestorInfo(chosenRow);
 	updateShareUrlForRow(chosenRow, 'push');
-	applyRowToSelectors(chosenRow);
 	enableRatingMeter();
 	clearSelectedRatingUI();
 	setRatingStatus('');
+	refreshGiggleThisForCurrentImage();
 
 	const isRandomGeneration =
 		randomGigglePendingTracking &&
@@ -883,76 +887,6 @@ function showRandomMatchingImage() {
 	}
 
 	const CAPTION_MAX = 120;
-	const CAPTION_LIMIT = 1;
-	const CAPTION_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
-	const CAPTION_LS_KEY = 'ag_giggle_this_submissions';
-
-	function readCaptionStorage() {
-		try {
-			const raw = localStorage.getItem(CAPTION_LS_KEY);
-
-			if (!raw) {
-				return { byImage: {} };
-			}
-
-			const parsed = JSON.parse(raw);
-
-			if (parsed && typeof parsed === 'object' && parsed.byImage) {
-				return parsed;
-			}
-
-			return { byImage: {} };
-		} catch (error) {
-			return { byImage: {} };
-		}
-	}
-
-	function writeCaptionStorage(data) {
-		try {
-			localStorage.setItem(CAPTION_LS_KEY, JSON.stringify(data));
-		} catch (error) {
-			console.warn('Could not save caption submissions to localStorage.', error);
-		}
-	}
-
-	function getCaptionSubmissions(imageId) {
-		const key = String(imageId);
-		const storage = readCaptionStorage();
-		const now = Date.now();
-		const entries = Array.isArray(storage.byImage[key]) ? storage.byImage[key] : [];
-		const fresh = entries.filter(function (entry) {
-			return (
-				entry &&
-				typeof entry.submittedAt === 'number' &&
-				now - entry.submittedAt < CAPTION_WINDOW_MS
-			);
-		});
-
-		storage.byImage[key] = fresh;
-		writeCaptionStorage(storage);
-
-		return fresh;
-	}
-
-	function canSubmitCaption(imageId) {
-		if (!imageId) {
-			return false;
-		}
-
-		return getCaptionSubmissions(imageId).length < CAPTION_LIMIT;
-	}
-
-	function recordCaptionSubmission(imageId) {
-		const key = String(imageId);
-		const storage = readCaptionStorage();
-
-		if (!Array.isArray(storage.byImage[key])) {
-			storage.byImage[key] = [];
-		}
-
-		storage.byImage[key].push({ submittedAt: Date.now() });
-		writeCaptionStorage(storage);
-	}
 
 	function setGiggleThisStatus(message, type) {
 		if (!giggleThisStatus) {
@@ -1038,26 +972,39 @@ function showRandomMatchingImage() {
 	}
 
 	function updateCaptionLimitUI(imageId) {
-		if (!giggleThisSubmit) {
-			return;
+
+		const allowed =
+			window.giggleThisStorage &&
+			window.giggleThisStorage.canSubmitCaption(imageId);
+	
+		if (giggleThisSubmit) {
+			giggleThisSubmit.disabled = !allowed;
 		}
-
-		const allowed = canSubmitCaption(imageId);
-		giggleThisSubmit.disabled = !allowed;
-
+	
+		if (giggleThisInput) {
+			giggleThisInput.disabled = !allowed;
+		}
+	
 		if (!allowed) {
+	
 			setGiggleThisStatus(
-				'You can submit up to 3 captions for this image every 7 days.',
+				'You already submitted a caption for this image today.',
 				'error'
 			);
-		} else if (giggleThisStatus && giggleThisStatus.classList.contains('is-error')) {
-			setGiggleThisStatus('');
+	
+			return;
 		}
+	
+		setGiggleThisStatus('');
 	}
 
 	function enableGiggleThis() {
 		if (giggleThisSection) {
 			giggleThisSection.classList.remove('is-disabled');
+		}
+
+		if (giggleThisInput) {
+			giggleThisInput.disabled = false;
 		}
 	}
 
@@ -1076,6 +1023,10 @@ function showRandomMatchingImage() {
 
 		if (giggleThisSubmit) {
 			giggleThisSubmit.disabled = true;
+		}
+
+		if (giggleThisInput) {
+			giggleThisInput.disabled = true;
 		}
 
 		setGiggleThisStatus('');
@@ -1696,6 +1647,8 @@ function closeImageModal() {
 		imageModalCanvas.hidden = true;
 		imageModalCanvas.style.display = '';
 	}
+
+	refreshGiggleThisForCurrentImage();
 }
 
 function showImageFullscreenOnMobile() {
@@ -1831,9 +1784,6 @@ if (giggleImageWrap) {
 					new Date().toDateString()
 				);
 
-				//requestTextarea.disabled = true;
-				//requestSubmitButton.disabled = true;
-
 				requestForm.reset();
 
 				if (requestStatus) {
@@ -1886,9 +1836,9 @@ if (giggleImageWrap) {
 				return;
 			}
 
-			if (!canSubmitCaption(imageId)) {
+			if (!window.giggleThisStorage.canSubmitCaption(imageId)) {
 				setGiggleThisStatus(
-					'You can submit up to 3 captions for this image every 7 days.',
+					'You already submitted a caption for this image today.',
 					'error'
 				);
 				updateCaptionLimitUI(imageId);
@@ -1912,7 +1862,7 @@ if (giggleImageWrap) {
 				return;
 			}
 
-			recordCaptionSubmission(imageId);
+			window.giggleThisStorage.recordCaptionSubmission(imageId);
 
 			if (giggleThisForm) {
 				giggleThisForm.reset();
@@ -1925,10 +1875,6 @@ if (giggleImageWrap) {
 				}
 			}
 
-			setGiggleThisStatus(
-				result.message || 'Thanks! Your caption is pending approval (1–3 days).',
-				'success'
-			);
 			updateCaptionLimitUI(imageId);
 		});
 

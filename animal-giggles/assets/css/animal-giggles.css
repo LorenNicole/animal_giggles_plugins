@@ -1,4 +1,8 @@
 
+:root {
+	 
+}
+
 main {
 	margin-block-start: 0;
 }
@@ -520,13 +524,24 @@ main {
 .ag-social-btn {
 	width: 40px;
 	height: 40px;
-	border: none;
 	background: transparent;
 	cursor: pointer;
 	padding: 0;
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	border: 0;
+	border-radius: 50%;
+}
+
+.ag-social-btn:focus {
+	outline: none;
+}
+
+.ag-social-btn:focus-visible {
+	outline: 3px solid #7ddcff;
+	outline-offset: 4px;
+	border-radius: 50%;
 }
 
 .ag-social-btn img {
@@ -535,19 +550,6 @@ main {
 	object-fit: contain;
 	border-radius: 50%;
 	box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-}
-
-/* Platform colors */
-.ag-facebook {
-	background: #1877f2;
-}
-
-.ag-x {
-	background: #000000;
-}
-
-.ag-pinterest {
-	background: #e60023;
 }
 
 /* Hover effect */

@@ -102,9 +102,17 @@ class Animal_Giggles {
 		);
 
 		wp_register_script(
+			'ag-giggle-this',
+			AG_PLUGIN_URL . 'assets/js/giggle-this.js',
+			array(),
+			AG_PLUGIN_VERSION,
+			true
+		);
+
+		wp_register_script(
 			'ag-frontend',
 			AG_PLUGIN_URL . 'assets/js/animal-giggles.js',
-			array(),
+			[ 'ag-giggle-this' ],
 			AG_PLUGIN_VERSION,
 			true
 		);
@@ -204,6 +212,7 @@ class Animal_Giggles {
 		wp_enqueue_style( 'ag-rating-animal-stampede-animation' );
 		wp_enqueue_style( 'ag-rating-black-hole-animation' );
 
+		wp_enqueue_script( 'ag-giggle-this' );
 		wp_enqueue_script( 'ag-frontend' );
 		wp_enqueue_script( 'ag-rating-explode-animation' );
 		wp_enqueue_script( 'ag-rating-shock-wave-animation' );
@@ -530,15 +539,15 @@ class Animal_Giggles {
 							</button>
 
 							<button type="button" class="ag-social-btn ag-facebook" data-platform="facebook" hidden>
-								<img src="<?php echo esc_url( $asset_config['social_icons']['facebook'] ); ?>" alt="<?php esc_attr_e( 'Share on Facebook', 'animal-giggles' ); ?>">
-							</button>
+								<img src="<?php echo esc_url( AG_PLUGIN_URL . 'assets/images/facebook.svg' ); ?>" alt="<?php esc_attr_e( 'Share on Facebook', 'animal-giggles' ); ?>">
+>							</button>
 
 							<button type="button" class="ag-social-btn ag-x" data-platform="x" hidden>
-								<img src="<?php echo esc_url( $asset_config['social_icons']['x'] ); ?>" alt="<?php esc_attr_e( 'Share on X', 'animal-giggles' ); ?>">
+								<img src="<?php echo esc_url( AG_PLUGIN_URL . 'assets/images/x.svg' ); ?>" alt="<?php esc_attr_e( 'Share on X', 'animal-giggles' ); ?>">
 							</button>
 
 							<button type="button" class="ag-social-btn ag-pinterest" data-platform="pinterest" hidden>
-								<img src="<?php echo esc_url( $asset_config['social_icons']['pinterest'] ); ?>" alt="<?php esc_attr_e( 'Share on Pinterest', 'animal-giggles' ); ?>">
+								<img src="<?php echo esc_url( AG_PLUGIN_URL . 'assets/images/pinterest.svg' ); ?>" alt="<?php esc_attr_e( 'Share on Pinterest', 'animal-giggles' ); ?>">
 							</button>
 						</div>
 					</div>
