@@ -12,7 +12,7 @@ window.AnimalGigglesRatingAnimations = window.AnimalGigglesRatingAnimations || {
 		- 'black-hole-collapse'
 	*/
 
-	forcedAnimation: 'shockwave',
+	forcedAnimation: null,
 
 	register: function (animation) {
 		if (!animation || typeof animation.run !== 'function') {
