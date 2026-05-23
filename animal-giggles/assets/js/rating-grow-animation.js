@@ -50,7 +50,7 @@
 
 		setTimeout(function () {
 			layer.remove();
-		}, 6800);
+		}, 10200);
 	}
 
 	window.AnimalGigglesRatingAnimations.register({

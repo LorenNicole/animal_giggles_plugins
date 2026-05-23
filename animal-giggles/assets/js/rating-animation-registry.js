@@ -11,7 +11,7 @@ window.AnimalGigglesRatingAnimations = window.AnimalGigglesRatingAnimations || {
 		- 'animal-stampede'
 		- 'black-hole-collapse'
 	*/
-	forcedAnimation: null,
+	forcedAnimation: 'rating-grow',
 
 	register: function (animation) {
 		if (!animation || typeof animation.run !== 'function') {
