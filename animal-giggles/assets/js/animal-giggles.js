@@ -72,6 +72,36 @@ document.addEventListener('DOMContentLoaded', function () {
 		return;
 	}
 
+	const ratingFxToggles = Array.from(
+		document.querySelectorAll('[data-ag-rating-fx-toggle]')
+	);
+	
+	const ratingFxEnabled =
+		localStorage.getItem('ag_rating_fx_enabled') !== 'false';
+	
+	function syncRatingFxToggles(enabled) {
+		ratingFxToggles.forEach(function (toggle) {
+			toggle.checked = enabled;
+		});
+	}
+	
+	syncRatingFxToggles(ratingFxEnabled);
+	
+	ratingFxToggles.forEach(function (toggle) {
+	
+		toggle.addEventListener('change', function () {
+	
+			const enabled = toggle.checked;
+	
+			localStorage.setItem(
+				'ag_rating_fx_enabled',
+				enabled
+			);
+	
+			syncRatingFxToggles(enabled);
+		});
+	});
+
 	document.querySelectorAll('[maxlength]').forEach(function (input) {
 		displayFormFieldCharacterCount(input);
 	});
@@ -853,7 +883,7 @@ function showRandomMatchingImage() {
 	}
 
 	const CAPTION_MAX = 120;
-	const CAPTION_LIMIT = 3;
+	const CAPTION_LIMIT = 1;
 	const CAPTION_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
 	const CAPTION_LS_KEY = 'ag_giggle_this_submissions';
 
@@ -1497,7 +1527,14 @@ ratingStars.forEach(function (star) {
 
 	star.addEventListener('click', async function () {
 		if (window.AnimalGigglesRatingAnimations) {
-			window.AnimalGigglesRatingAnimations.runRandom(star);
+			const ratingFxEnabled = localStorage.getItem('ag_rating_fx_enabled') !== 'false';
+
+			if (
+				ratingFxEnabled &&
+				window.AnimalGigglesRatingAnimations
+			) {
+				window.AnimalGigglesRatingAnimations.runRandom(star);
+			}
 		}
 		
 		if (!currentImageRow || !currentImageRow.imageId) {
@@ -1761,6 +1798,23 @@ if (giggleImageWrap) {
 			formData.append('nonce', localizedData.nonce || '');
 
 			try {
+				const today = new Date().toDateString();
+
+				const lastRequestDay =
+					localStorage.getItem('ag_request_day');
+
+				if (lastRequestDay === today) {
+
+					if (requestStatus) {
+						requestStatus.classList.remove('success');
+						requestStatus.classList.add('error');
+						requestStatus.textContent =
+							'You already submitted an Animal Giggle Request today.';
+					}
+
+					return;
+}
+
 				const response = await fetch(localizedData.ajaxUrl || '', {
 					method: 'POST',
 					body: formData
@@ -1771,6 +1825,14 @@ if (giggleImageWrap) {
 				if (!result || !result.success) {
 					throw new Error(result?.data?.message || 'Request failed.');
 				}
+
+				localStorage.setItem(
+					'ag_request_day',
+					new Date().toDateString()
+				);
+
+				//requestTextarea.disabled = true;
+				//requestSubmitButton.disabled = true;
 
 				requestForm.reset();
 

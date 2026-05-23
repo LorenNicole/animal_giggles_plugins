@@ -415,7 +415,7 @@ main {
 	margin-top: 1rem;
 }
 
-.ag-giggle-meter.is-disabled {
+..ag-giggle-meter.is-disabled .ag-rating-stars  {
 	/*opacity: 0.5;*/
 	pointer-events: none;
 }
@@ -431,6 +431,41 @@ main {
 
 .ag-giggle-meter.is-disabled .ag-rating-star:not(.is-selected) .ag-rating-star-icon {
 	color: #e5e7eb;
+}
+
+.ag-giggle-meter-header {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 12px;
+	margin-bottom: 10px;
+}
+
+.ag-rating-fx-checkbox {
+	z-index: 11;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding-top: 0.4rem;
+	cursor: pointer;
+	user-select: none;
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+}
+
+.ag-rating-fx-checkbox__input {
+	width: 14px;
+	height: 14px;
+	cursor: pointer;
+	accent-color: #6BCB77;
+	margin: 0;
+}
+
+.ag-rating-fx-checkbox__label {
+	opacity: 0.85;
+	color: #fff;
 }
 
 .ag-action-buttons {

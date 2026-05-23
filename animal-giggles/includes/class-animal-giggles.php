@@ -432,8 +432,21 @@ class Animal_Giggles {
 					</div>
 
 					<div id="ag-giggle-meter" class="ag-giggle-meter is-disabled">
-					<div class="ag-giggle-meter-label">
-						<?php esc_html_e( 'Giggle Meter', 'animal-giggles' ); ?>
+					<div class="ag-giggle-meter-header">
+						<div class="ag-giggle-meter-label">
+							<?php esc_html_e( 'Giggle Meter', 'animal-giggles' ); ?>
+						</div>
+
+						<label class="ag-rating-fx-checkbox">
+							<input
+								type="checkbox"
+								class="ag-rating-fx-checkbox__input"
+								data-ag-rating-fx-toggle
+								checked
+							>
+
+							<span class="ag-rating-fx-checkbox__label">Fun</span>
+						</label>
 					</div>
 
 					<div id="ag-rating-stars" class="ag-rating-stars" role="group" aria-label="<?php esc_attr_e( 'Giggle Meter from 1 to 5 stars', 'animal-giggles' ); ?>">
@@ -468,7 +481,7 @@ class Animal_Giggles {
 								class="ag-giggle-this__info"
 								tabindex="0"
 								role="button"
-								aria-label="<?php esc_attr_e( "All 'Giggle This' submissions take 1-3 days to be approved, or declined (if inappropriate).", 'animal-giggles' ); ?>"
+								aria-label="<?php esc_attr_e( "All 'Giggle This' submissions take 1-3 days to be approved.", 'animal-giggles' ); ?>"
 							></span>
 						</h4>
 
@@ -535,7 +548,22 @@ class Animal_Giggles {
 
 						<div class="ag-image-modal__dialog" role="dialog" aria-modal="true" aria-label="<?php esc_attr_e( 'Animal image preview', 'animal-giggles' ); ?>">
 							<div id="ag-giggle-meter-modal" class="ag-giggle-meter ag-giggle-meter-modal is-disabled">
-								<label for="ag-rating-stars-modal" class="ag-giggle-meter-label"><?php esc_html_e( 'Giggle Meter', 'animal-giggles' ); ?></label>
+							<div class="ag-giggle-meter-header">
+								<div class="ag-giggle-meter-label">
+									<?php esc_html_e( 'Giggle Meter', 'animal-giggles' ); ?>
+								</div>
+
+								<label class="ag-rating-fx-checkbox">
+									<input
+										type="checkbox"
+										class="ag-rating-fx-checkbox__input"
+										data-ag-rating-fx-toggle
+										checked
+									>
+
+									<span class="ag-rating-fx-checkbox__label">Fun</span>
+								</label>
+							</div>
 								<div id="ag-rating-stars-modal" class="ag-rating-stars ag-rating-stars-modal" role="group" aria-label="<?php esc_attr_e( 'Giggle Meter from 1 to 5 stars', 'animal-giggles' ); ?>">
 									<button type="button" class="ag-rating-star ag-rating-star-modal" data-rating-value="1" aria-label="<?php esc_attr_e( 'Rate 1 star', 'animal-giggles' ); ?>">
 										<span class="ag-rating-star-icon" aria-hidden="true">★</span>
