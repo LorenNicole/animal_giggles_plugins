@@ -163,6 +163,12 @@ class IDR_Import_Service {
 			$row['ProductId'] = idr_generate_product_id();
 		}
 
+		if ( isset( $schema['UploadedDate'] ) && ! array_key_exists( 'UploadedDate', $row ) ) {
+			$row['UploadedDate'] = current_time( 'mysql' );
+		}
+
+		$row['Archived'] = ! empty( $row['Archived'] ) ? 1 : 0;
+
 		$row = $this->prepare_field_storage_path( $row );
 
 		$data = [];

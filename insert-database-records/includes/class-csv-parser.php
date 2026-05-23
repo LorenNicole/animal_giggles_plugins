@@ -21,6 +21,20 @@ class IDR_CSV_Parser {
 
 		$header = array_map( [ $this, 'normalize_header' ], $header );
 
+		$duplicates = array_keys(
+			array_filter(
+				array_count_values( $header ),
+				static fn( $count ) => $count > 1
+			)
+		);
+		
+		if ( ! empty( $duplicates ) ) {
+			fclose( $handle );
+			throw new RuntimeException(
+				'CSV header contains duplicate column names: ' . implode( ', ', $duplicates )
+			);
+		}
+
 		if ( count( $header ) !== count( array_unique( $header ) ) ) {
 			fclose( $handle );
 			throw new RuntimeException( 'CSV header contains duplicate column names.' );

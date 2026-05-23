@@ -92,6 +92,13 @@ class IDR_Validator {
 			];
 		}
 
+		if ( in_array( 'UploadedDate', $header, true ) ) {
+			return [
+				'valid' => false,
+				'message' => 'UploadedDate should not be included in the CSV. It is generated automatically.',
+			];
+		}
+
 		$unknown = array_diff( $header, $schema_columns );
 		if ( ! empty( $unknown ) ) {
 			return [ 'valid' => false, 'message' => 'Unknown columns: ' . implode( ', ', $unknown ) ];
@@ -107,7 +114,7 @@ class IDR_Validator {
 			return [ 'valid' => false, 'message' => 'Generated columns cannot be imported: ' . implode( ', ', $generated ) ];
 		}
 
-		$system_generated_columns = [ 'ProductId', 'StoragePathDisplay', 'StoragePathPrint' ];
+		$system_generated_columns = [ 'ProductId', 'StoragePathDisplay', 'StoragePathPrint', 'UploadedDate' ];
 
 		$required = [];
 		foreach ( $schema as $column ) {
