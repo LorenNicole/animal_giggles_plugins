@@ -1390,33 +1390,67 @@ function updateDownloadAndShareButtonStates() {
 	}
 
 	if (socialButtons) {
-		socialButtons.forEach(function (btn) {
-			btn.addEventListener('click', function () {
-				const platform = btn.getAttribute('data-platform');
-				const url = encodeURIComponent(window.location.href);
-				const text = encodeURIComponent('Check out this Animal Giggles image');
+		if (socialButtons) {
 
-				let shareUrl = '';
-
-				if (platform === 'facebook') {
-					shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+			const shareUrls = {
+		
+				facebook: function (url) {
+					return `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+				},
+		
+				x: function (url, text) {
+					return `https://twitter.com/intent/tweet?url=${url}&text=${text}`;
+				},
+		
+				pinterest: function (url, text) {
+		
+					const image = encodeURIComponent(
+						giggleImage.src || ''
+					);
+		
+					return `https://pinterest.com/pin/create/button/?url=${url}&media=${image}&description=${text}`;
 				}
-
-				if (platform === 'x') {
-					shareUrl = `https://twitter.com/intent/tweet?url=${url}&text=${text}`;
-				}
-
-				if (platform === 'pinterest') {
-					const image = encodeURIComponent(giggleImage.src || '');
-					shareUrl = `https://pinterest.com/pin/create/button/?url=${url}&media=${image}&description=${text}`;
-				}
-
-				if (shareUrl) {
+			};
+		
+			socialButtons.forEach(function (btn) {
+		
+				btn.addEventListener('click', function () {
+		
+					const platform =
+						btn.getAttribute('data-platform');
+		
+					const url = encodeURIComponent(
+						window.location.href
+					);
+		
+					const text = encodeURIComponent(
+						'Check out this Animal Giggles image'
+					);
+		
+					const buildShareUrl =
+						shareUrls[platform];
+		
+					if (!buildShareUrl) {
+						return;
+					}
+		
+					const shareUrl =
+						buildShareUrl(url, text);
+		
+					if (!shareUrl) {
+						return;
+					}
+		
 					trackShareClick(platform);
-					window.open(shareUrl, '_blank', 'width=600,height=500');
-				}
+		
+					window.open(
+						shareUrl,
+						'_blank',
+						'noopener,noreferrer,width=600,height=500'
+					);
+				});
 			});
-		});
+		}
 	}
 
     // Initial state

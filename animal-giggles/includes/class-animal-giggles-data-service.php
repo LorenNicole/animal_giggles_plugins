@@ -443,7 +443,7 @@ class Animal_Giggles_Data_Service {
 		$head     = isset( $_POST['head'] ) ? sanitize_text_field( wp_unslash( $_POST['head'] ) ) : '';
 		$body     = isset( $_POST['body'] ) ? sanitize_text_field( wp_unslash( $_POST['body'] ) ) : '';
 		$butt     = isset( $_POST['butt'] ) ? sanitize_text_field( wp_unslash( $_POST['butt'] ) ) : '';
-		$setting  = isset( $_POST['setting'] ) ? sanitize_text_field( wp_unslash( $_POST['setting'] ) ) : '';
+		$setting = isset( $_POST['setting'] ) ? sanitize_textarea_field( wp_unslash( $_POST['setting'] ) ) : '';
 		$country  = isset( $_POST['country'] ) ? sanitize_text_field( wp_unslash( $_POST['country'] ) ) : '';
 		$comments = isset( $_POST['comments'] ) ? sanitize_textarea_field( wp_unslash( $_POST['comments'] ) ) : '';
 
@@ -534,7 +534,7 @@ class Animal_Giggles_Data_Service {
 			foreach ( $rows as $row ) {
 				$captions[] = array(
 					'id'      => isset( $row['id'] ) ? (int) $row['id'] : 0,
-					'caption' => isset( $row['caption'] ) ? (string) $row['caption'] : '',
+					'caption' => isset( $row['caption'] ) ? esc_html( $row['caption'] ) : '',
 				);
 			}
 		}
@@ -555,7 +555,7 @@ class Animal_Giggles_Data_Service {
 		check_ajax_referer( 'ag_nonce', 'nonce' );
 
 		$image_id = isset( $_POST['image_id'] ) ? (int) $_POST['image_id'] : 0;
-		$caption  = isset( $_POST['caption'] ) ? sanitize_text_field( wp_unslash( $_POST['caption'] ) ) : '';
+		$caption  = $caption = isset( $_POST['caption'] ) ? sanitize_textarea_field( wp_unslash( $_POST['caption'] ) ) : '';
 		$caption  = trim( $caption );
 
 		if ( $image_id < 1 ) {
