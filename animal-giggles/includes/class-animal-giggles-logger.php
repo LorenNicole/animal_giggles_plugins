@@ -52,6 +52,8 @@ class Animal_Giggles_Logger {
 			"Time: " . current_time( 'mysql' ) . "\n\n" .
 			"Context:\n" . print_r( $context, true );
 
-		wp_mail( $to, $subject, $body );
+        if ( function_exists( 'wp_mail' ) ) {
+            wp_mail( $to, $subject, $body );
+        }
 	}
 }

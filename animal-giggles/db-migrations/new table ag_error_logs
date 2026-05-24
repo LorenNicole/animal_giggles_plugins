@@ -1,0 +1,12 @@
+CREATE TABLE ag_error_logs (
+	id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+	level VARCHAR(20) NOT NULL DEFAULT 'error',
+	source VARCHAR(100) NULL,
+	message TEXT NOT NULL,
+	context LONGTEXT NULL,
+	url TEXT NULL,
+	user_agent TEXT NULL,
+	created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	PRIMARY KEY (id),
+	INDEX idx_level_created (level, created_at)
+);
