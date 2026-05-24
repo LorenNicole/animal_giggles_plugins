@@ -647,7 +647,7 @@ class Animal_Giggles_Data_Service {
 			foreach ( $rows as $row ) {
 				$captions[] = array(
 					'id'      => isset( $row['id'] ) ? (int) $row['id'] : 0,
-					'caption' => isset( $row['caption'] ) ? esc_html( $row['caption'] ) : '',
+					'caption' => isset( $row['caption'] ) ? (string) $row['caption'] : '',
 				);
 			}
 		}

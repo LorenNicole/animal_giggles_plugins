@@ -19,6 +19,7 @@ define( 'AG_PLUGIN_FILE', __FILE__ );
 define( 'AG_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'AG_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 
+require_once AG_PLUGIN_DIR . 'includes/class-animal-giggles-logger.php';
 require_once AG_PLUGIN_DIR . 'includes/class-animal-giggles.php';
 require_once AG_PLUGIN_DIR . 'includes/class-animal-giggles-data-service.php';
 require_once AG_PLUGIN_DIR . 'includes/class-animal-giggles-router.php';
