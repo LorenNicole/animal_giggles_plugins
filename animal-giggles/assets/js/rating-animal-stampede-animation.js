@@ -80,6 +80,8 @@
 
 	window.AnimalGigglesRatingAnimations.register({
 		name: 'animal-stampede',
+		allowMobile: true,
+		allowDesktop: true,
 		run: runAnimalStampede
 	});
 })();

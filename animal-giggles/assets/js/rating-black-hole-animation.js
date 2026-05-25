@@ -97,6 +97,8 @@
 
 	window.AnimalGigglesRatingAnimations.register({
 		name: 'black-hole-collapse',
+		allowMobile: true,
+		allowDesktop: true,
 		run: runBlackHoleCollapse
 	});
 })();

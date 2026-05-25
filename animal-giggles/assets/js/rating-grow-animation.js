@@ -1,10 +1,24 @@
 (function () {
 	function getStarColor(buttonElement) {
+
+		if (
+			buttonElement.classList.contains('is-selected') ||
+			buttonElement.classList.contains('is-hovered')
+		) {
+			return '#FFD700';
+		}
+	
 		const icon = buttonElement.querySelector('.ag-rating-star-icon');
 		const target = icon || buttonElement;
 		const styles = window.getComputedStyle(target);
-
-		return styles.color || 'gold';
+	
+		const color = styles.color;
+	
+		if (!color || color === 'rgb(0, 0, 0)' || color === 'rgba(0, 0, 0, 0)') {
+			return '#FFD700';
+		}
+	
+		return color;
 	}
 
 	function getStarText(buttonElement) {
@@ -55,6 +69,8 @@
 
 	window.AnimalGigglesRatingAnimations.register({
 		name: 'rating-grow',
+		allowMobile: true,
+		allowDesktop: true,
 		run: runRatingGrow
 	});
 })();

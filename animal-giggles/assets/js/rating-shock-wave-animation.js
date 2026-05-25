@@ -68,6 +68,8 @@
 
 	window.AnimalGigglesRatingAnimations.register({
 		name: 'shockwave',
+		allowMobile: true,
+		allowDesktop: true,
 		run: runShockwave
 	});
 

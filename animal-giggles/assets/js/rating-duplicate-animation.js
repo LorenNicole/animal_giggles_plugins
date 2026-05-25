@@ -110,6 +110,8 @@
 
 	window.AnimalGigglesRatingAnimations.register({
 		name: 'rating-duplicate',
+		allowMobile: true,
+		allowDesktop: true,
 		run: runRatingDuplicate
 	});
 })();
