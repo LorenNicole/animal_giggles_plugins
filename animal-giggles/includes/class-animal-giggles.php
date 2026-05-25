@@ -43,6 +43,7 @@ class Animal_Giggles {
 		error_log( 'AG DEBUG ag_product_id=' . print_r( get_query_var( 'ag_product_id' ), true ) );
 
 		$config = $this->ajax_service->get_animal_config();
+
 		$default_image_row = $this->get_default_image_row_data( $config['image_rows'] );
 
 		wp_register_style(
@@ -362,6 +363,7 @@ class Animal_Giggles {
 
 		$config = $this->ajax_service->get_animal_config();
 		$asset_config = $this->config->get_asset_config();
+		$country_options = $this->config->get_country_options();
 
 		ob_start();
 		?>
@@ -651,22 +653,22 @@ class Animal_Giggles {
 					<input id="request-name" type="text" name="name" placeholder="Your First Name" maxlength="100">
 
 					<label for="request-country"><?php esc_html_e( 'Country *', 'animal-giggles' ); ?></label>
-					<select id="request-country" name="country" required>
-						<option value="">- select country -</option>
-						<option value="United States">United States</option>
-						<option value="Canada">Canada</option>
-						<option value="United Kingdom">United Kingdom</option>
-						<option value="Australia">Australia</option>
-						<option value="Other">Other</option>
-					</select>
+						<select id="request-country" name="country" required>
+							<option value=""><?php esc_html_e( '- select country -', 'animal-giggles' ); ?></option>
+
+							<?php foreach ( $country_options as $country ) : ?>
+								<option value="<?php echo esc_attr( $country ); ?>">
+									<?php echo esc_html( $country ); ?>
+								</option>
+							<?php endforeach; ?>
+						</select>
 
 					<label class="ag-consent">
 						<input type="checkbox" name="consent" required>
 						I agree that my name and country may be shown with the generated image on this website.
 					</label>
 					<button type="submit" class="request-giggle-btn">Request Animal Giggle</button>
-					<p class="request-status request-info"><?php esc_html_e( 'Requests are typically available within 2-3 business days.', 'animal-giggles' ); ?></p>
-					<p class="request-approval request-info"><?php esc_html_e( 'Requests that are deemed inappropriate will be rejected.', 'animal-giggles' ); ?></p>
+					<p class="request-status request-info"><?php esc_html_e( 'Requests typically take 2-3 days to be approved.', 'animal-giggles' ); ?></p>
 					<div id="ag-request-status" aria-live="polite"></div>
 				</form>			</div>
 		<?php

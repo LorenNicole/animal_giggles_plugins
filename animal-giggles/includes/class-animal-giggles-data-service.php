@@ -736,9 +736,11 @@ class Animal_Giggles_Data_Service {
 				404
 			);
 		}
+
+		$table_name = 'captions_broken';
 	
 		$result = $wpdb->insert(
-			'captions',
+			$table_name,
 			array(
 				'image_id'  => $image_id,
 				'caption'   => $caption,

@@ -41,4 +41,40 @@ class Animal_Giggles_Config {
 			),
 		);
 	}
+
+	public function get_country_options() {
+		return array(
+			'United States',
+			'Argentina',
+			'Australia',
+			'Austria',
+			'Belgium',
+			'Brazil',
+			'Canada',
+			'China',
+			'France',
+			'Germany',
+			'India',
+			'Indonesia',
+			'Ireland',
+			'Israel',
+			'Italy',
+			'Japan',
+			'Mexico',
+			'Netherlands',
+			'Norway',
+			'Poland',
+			'Russia',
+			'Saudi Arabia',
+			'South Korea',
+			'Spain',
+			'Sweden',
+			'Switzerland',
+			'Taiwan',
+			'Thailand',
+			'Turkey',
+			'United Kingdom',
+			'Other',
+		);
+	}
 }
